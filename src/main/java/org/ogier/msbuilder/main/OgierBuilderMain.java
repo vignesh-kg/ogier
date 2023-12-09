@@ -3,9 +3,6 @@ package org.ogier.msbuilder.main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class OgierBuilderMain
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(OgierBuilderMain.class);
