@@ -1,3 +1,4 @@
 org:
   ogier:
-    modules: api, resource, service, persistence, gateways, test, dummy
+    modules: api, resource, service, persistence, gateways, test, parent, async
+    mandatorymodules : parent

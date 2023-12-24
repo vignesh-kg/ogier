@@ -1,5 +1,9 @@
 package org.ogier.msbuilder.util.interfaces;
 
+import java.util.Map;
+
 public interface IDirectoryUtil {
-    boolean createDirectory();
+    void createModules(Map<String, String> argMap);
+
+    void createDirectory(String directoryPath);
 }
