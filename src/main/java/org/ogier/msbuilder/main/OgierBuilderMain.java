@@ -1,11 +1,15 @@
 package org.ogier.msbuilder.main;
 
+import org.ogier.msbuilder.config.YamlPropertyLoaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.PropertySource;
 
+@PropertySource(value = {"classpath:main-config.yaml"}, factory = YamlPropertyLoaderFactory.class)
 @SpringBootApplication
 public class OgierBuilderMain
 {

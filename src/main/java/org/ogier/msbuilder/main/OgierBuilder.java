@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Component
 public class OgierBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OgierBuilder.class);
 
     @Autowired
     private IDirectoryUtil directoryUtil;

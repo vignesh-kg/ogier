@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource(value = {"classpath:main-config.yaml"}, factory = YamlPropertyLoaderFactory.class)
-@ComponentScan(basePackages = {"org.ogier.msbuilder.util"})
+@ComponentScan(basePackages = {"org.ogier.msbuilder"})
 public class BeanConfig {
 }
