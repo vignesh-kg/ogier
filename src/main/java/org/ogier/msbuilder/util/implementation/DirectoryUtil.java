@@ -2,6 +2,7 @@ package org.ogier.msbuilder.util.implementation;
 
 import org.ogier.msbuilder.constants.OgierConstants;
 import org.ogier.msbuilder.util.interfaces.IDirectoryUtil;
+import org.ogier.msbuilder.util.interfaces.IPomAdder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,30 +21,39 @@ public class DirectoryUtil implements IDirectoryUtil {
     @Autowired
     private OgierConfiguration ogierConfiguration;
 
+    @Autowired
+    private IPomAdder pomAdder;
+
     @Override
     public void createModules(Map<String, String> argMap) {
         LOGGER.info(String.join(",", ogierConfiguration.getModules()));
         List<String> modulesToCreate = getModulesToCreate(argMap);
         String directoryPath = getDirectoryPath(argMap);
         String msName = argMap.get(OgierConstants.KEY_MSNAME);
+        String groupId = argMap.get(OgierConstants.KEY_GROUPID);
+        createRootDirectoryAndAddReactorPOM(directoryPath + msName, msName, modulesToCreate, groupId);
 
         modulesToCreate.forEach(moduleToCreate -> {
-            String folderName = msName+"-"+moduleToCreate;
-            createDirectory(directoryPath+msName+"/"+folderName);
+            String folderName = msName + "-" + moduleToCreate;
+            createDirectory(directoryPath + msName + "/" + folderName);
         });
         LOGGER.info("Modules created successfully in {}", directoryPath);
     }
 
+    private void createRootDirectoryAndAddReactorPOM(String directoryPath, String msName, List<String> modules, String groupId) {
+        createDirectory(directoryPath);
+        pomAdder.createReactorPOM(directoryPath,msName,modules,groupId);
+    }
+
     @Override
-    public void createDirectory(String directoryPath)
-    {
+    public void createDirectory(String directoryPath) {
         File newDirectory = new File(directoryPath);
         if (!newDirectory.isDirectory()) {
             try {
                 newDirectory.mkdirs();
-                LOGGER.info("{} created successfully",directoryPath);
-            } catch (Exception e){
-                LOGGER.error("Error creating Directory: {}, exception {}",directoryPath, e.toString());
+                LOGGER.info("{} created successfully", directoryPath);
+            } catch (Exception e) {
+                LOGGER.error("Error creating Directory: {}, exception {}", directoryPath, e.toString());
                 exit(1);
             }
         } else {
@@ -51,15 +61,12 @@ public class DirectoryUtil implements IDirectoryUtil {
         }
     }
 
-    private String getDirectoryPath(Map<String, String> argMap)
-    {
+    private String getDirectoryPath(Map<String, String> argMap) {
         String directoryPath = argMap.get(OgierConstants.KEY_DIRECTORYPATH);
 
-        if(!StringUtils.hasText(directoryPath))
-        {
+        if (!StringUtils.hasText(directoryPath)) {
 
-        }
-        else {
+        } else {
 
         }
 
@@ -74,22 +81,18 @@ public class DirectoryUtil implements IDirectoryUtil {
      * @param argMap
      * @return
      */
-    private List<String> getModulesToCreate(Map<String, String> argMap)
-    {
+    private List<String> getModulesToCreate(Map<String, String> argMap) {
         List<String> defaultModules = ogierConfiguration.getModules();
         List<String> excludedModules = new ArrayList<>();
         List<String> additionalModules = new ArrayList<>();
 
         String modulesToExclude = argMap.get(OgierConstants.KEY_EXCLUDEMODULES);
-        if(StringUtils.hasText(modulesToExclude))
-        {
-            for(String moduleToExclude : modulesToExclude.split(","))
-            {
+        if (StringUtils.hasText(modulesToExclude)) {
+            for (String moduleToExclude : modulesToExclude.split(",")) {
                 String module = moduleToExclude.trim();
-                if(!ogierConfiguration.getMandatorymodules().contains(module)) {
+                if (!ogierConfiguration.getMandatorymodules().contains(module)) {
                     excludedModules.add(module);
-                }
-                else {
+                } else {
                     LOGGER.info("{} is a mandatory Module. Cannot exclude", module);
                 }
             }
@@ -97,10 +100,8 @@ public class DirectoryUtil implements IDirectoryUtil {
         }
 
         String additionalModulesToCreate = argMap.get(OgierConstants.KEY_ADDITIONALMODULES);
-        if(StringUtils.hasText(additionalModulesToCreate))
-        {
-            for(String additionalModuleToCreate : additionalModulesToCreate.split(","))
-            {
+        if (StringUtils.hasText(additionalModulesToCreate)) {
+            for (String additionalModuleToCreate : additionalModulesToCreate.split(",")) {
                 additionalModules.add(additionalModuleToCreate.trim());
             }
             LOGGER.info("Additional Modules to be created: {}", additionalModules);

@@ -6,4 +6,5 @@ public interface OgierConstants
     String KEY_EXCLUDEMODULES = "excludemodules";
     String KEY_ADDITIONALMODULES = "additionalmodules";
     String KEY_MSNAME = "msname";
+    String KEY_GROUPID = "groupid";
 }
