@@ -34,11 +34,15 @@ public class PomAdder implements IPomAdder
 
         Build build = new Build();
         Plugin plugin = new Plugin();
-        plugin.setGroupId("org.apache.maven.plugins");
+        String pluginGroupId = "org.apache.maven.plugins";
+        plugin.setGroupId(pluginGroupId);
         plugin.setArtifactId("maven-deploy-plugin");
-        Xpp3Dom configuration = new Xpp3Dom("configuration");
-        configuration.setAttribute("skip","true");
-        plugin.setConfiguration(configuration);
+        Xpp3Dom configurationElement = new Xpp3Dom("configuration");
+        Xpp3Dom skip = new Xpp3Dom("skip");
+        skip.setValue("true");
+        skip.setParent(configurationElement);
+        configurationElement.addChild(skip);
+        plugin.setConfiguration(configurationElement);
         List<Plugin> plugins = new ArrayList<>();
         plugins.add(plugin);
         build.setPlugins(plugins);
