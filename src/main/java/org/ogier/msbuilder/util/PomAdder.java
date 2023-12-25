@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -31,18 +32,32 @@ public class PomAdder implements IPomAdder
         model.setVersion("1.0-SNAPSHOT");
         model.setPackaging("pom");
         model.setName("${project.groupId}:${project.artifactId}");
+        model.setModelVersion("4.0.0");
+
+        List<String> modulesList = new ArrayList<>();
+
+        for(String module : modules)
+        {
+            modulesList.add(msName+"-"+module);
+        }
+        Collections.sort(modulesList);
+        modulesList.remove(msName+"-parent");
+        modulesList.remove(msName+"-exe");
+        modulesList.add(0,msName+"-parent");
+        modulesList.add((modulesList.size()-1), msName+"-exe");
+        model.setModules(modulesList);
 
         Build build = new Build();
         Plugin plugin = new Plugin();
-        String pluginGroupId = "org.apache.maven.plugins";
-        plugin.setGroupId(pluginGroupId);
-        plugin.setArtifactId("maven-deploy-plugin");
         Xpp3Dom configurationElement = new Xpp3Dom("configuration");
         Xpp3Dom skip = new Xpp3Dom("skip");
         skip.setValue("true");
         skip.setParent(configurationElement);
         configurationElement.addChild(skip);
         plugin.setConfiguration(configurationElement);
+        String pluginGroupId = "org.apache.maven.plugins";
+        plugin.setGroupId(pluginGroupId);
+        plugin.setArtifactId("maven-deploy-plugin");
         List<Plugin> plugins = new ArrayList<>();
         plugins.add(plugin);
         build.setPlugins(plugins);
