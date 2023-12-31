@@ -13,6 +13,16 @@ public class OgierConfiguration {
 
     private List<String> mandatorymodules = new ArrayList<>();
 
+    private List<String> nonbusinessmodules = new ArrayList<>();
+
+    public List<String> getNonbusinessmodules() {
+        return nonbusinessmodules;
+    }
+
+    public void setNonbusinessmodules(List<String> nonbusinessmodules) {
+        this.nonbusinessmodules = nonbusinessmodules;
+    }
+
     public List<String> getMandatorymodules() {
         return mandatorymodules;
     }
