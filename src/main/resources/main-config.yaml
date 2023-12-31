@@ -2,4 +2,4 @@ org:
   ogier:
     modules: api, resource, service, persistence, gateways, test, parent, async, exe
     mandatorymodules : parent, exe
-    nonbusinessmodules: parent, exe, api, async, test
+    nonbusinessmodules: exe, api, async, test
