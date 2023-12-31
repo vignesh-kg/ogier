@@ -36,6 +36,7 @@ public class DirectoryUtil implements IDirectoryUtil {
         modulesToCreate.forEach(moduleToCreate -> {
             String folderName = msName + "-" + moduleToCreate;
             createDirectory(directoryPath + msName + "/" + folderName);
+            pomAdder.addPom(directoryPath + msName + "/" + folderName, msName, moduleToCreate, groupId);
         });
         LOGGER.info("Modules created successfully in {}", directoryPath);
     }
