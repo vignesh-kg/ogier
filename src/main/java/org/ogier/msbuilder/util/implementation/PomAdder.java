@@ -65,7 +65,7 @@ public class PomAdder implements IPomAdder {
     }
 
     @Override
-    public void addPom(String directoryPath, String msName, String module, String groupId, String apiYamlPath, String asyncYamlPath) {
+    public void addPom(String directoryPath, String msName, String module, String groupId, boolean isApiYamlPresent, boolean isAsyncYamlPresent) {
         if ("parent".equalsIgnoreCase(module)) {
             Model model = createModel(new PomModel(groupId, msName + "-" + module,
                     OgierConstants.SNAPSHOT_VERSION, "pom", "${project.groupId}:${project.artifactId}", "4.0.0"));
@@ -79,7 +79,23 @@ public class PomAdder implements IPomAdder {
                     OgierConstants.SNAPSHOT_VERSION, null, "${project.groupId}:${project.artifactId}", "4.0.0"));
             model.setParent(createParent(module, groupId, msName));
             model.setDependencies(createDependencies(module, msName, groupId));
+            if ("api".equalsIgnoreCase(module) || "async".equalsIgnoreCase(module)) {
+                addAdditionalPropertiesForApiOrAsyncModules(module, model.getProperties(), groupId, isApiYamlPresent, isAsyncYamlPresent);
+            }
             writeToPom(directoryPath, model);
+        }
+    }
+
+    private void addAdditionalPropertiesForApiOrAsyncModules(String module, Properties properties, String groupId, boolean isApiYamlPresent, boolean isAsyncYamlPresent) {
+        if ("api".equalsIgnoreCase(module) && isApiYamlPresent) {
+            properties.setProperty(OgierConstants.SWAGGER_SRC_PROPERTY, "${project.basedir}/" + OgierConstants.SWAGGER_PATH);
+            properties.setProperty(OgierConstants.API_PACKAGE, groupId + ".resources.interfaces");
+            properties.setProperty(OgierConstants.MODEL_PACKAGE, groupId + ".resources.models");
+        }
+
+        if ("async".equalsIgnoreCase(module) && isAsyncYamlPresent) {
+            properties.setProperty(OgierConstants.SWAGGER_SRC_PROPERTY, "${project.basedir}/" + OgierConstants.SWAGGER_PATH);
+            properties.setProperty(OgierConstants.MODEL_PACKAGE, groupId + ".asyncmessages.models");
         }
     }
 
@@ -108,14 +124,12 @@ public class PomAdder implements IPomAdder {
     }
 
     private void createInterModuleDependency(List<Dependency> dependencyList, String module, String msName) {
-        if(ogierConfiguration.getIntermoduledependency().containsKey(module))
-        {
+        if (ogierConfiguration.getIntermoduledependency().containsKey(module)) {
             List<String> moduleDependencies = ogierConfiguration.getIntermoduledependency().get(module);
-            for(String moduleDependency : moduleDependencies)
-            {
+            for (String moduleDependency : moduleDependencies) {
                 Dependency dependency = new Dependency();
                 dependency.setGroupId("${project.groupId}");
-                dependency.setArtifactId(msName+"-"+moduleDependency);
+                dependency.setArtifactId(msName + "-" + moduleDependency);
                 dependency.setVersion("${project.version}");
                 dependencyList.add(dependency);
             }

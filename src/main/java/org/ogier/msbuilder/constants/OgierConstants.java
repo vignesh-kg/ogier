@@ -23,4 +23,8 @@ public interface OgierConstants
 
     String ASYNC_YAML = "asyncyaml";
     String SWAGGER_PATH = "src/main/resources/swagger";
+
+    String API_PACKAGE = "api-package";
+    String MODEL_PACKAGE = "model-package";
+    String SWAGGER_SRC_PROPERTY = "swagger.src";
 }
