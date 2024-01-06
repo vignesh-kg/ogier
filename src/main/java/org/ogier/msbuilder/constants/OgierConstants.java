@@ -18,4 +18,9 @@ public interface OgierConstants
 
     String SRC_TEST_JAVA = "src/test/java";
     String SRC_TEST_RESOURCES = "src/test/resources";
+
+    String API_YAML = "apiyaml";
+
+    String ASYNC_YAML = "asyncyaml";
+    String SWAGGER_PATH = "src/main/resources/swagger";
 }
