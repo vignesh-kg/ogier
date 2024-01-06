@@ -45,7 +45,7 @@ public class DirectoryUtil implements IDirectoryUtil {
             String rootDirectoryPath = directoryPath + msName + "/" + folderName;
             createDirectory(rootDirectoryPath);
             createSubFolders(groupId, moduleToCreate, rootDirectoryPath, apiYamlPath, asyncYamlPath);
-            pomAdder.addPom(rootDirectoryPath, msName, moduleToCreate, groupId);
+            pomAdder.addPom(rootDirectoryPath, msName, moduleToCreate, groupId, apiYamlPath, asyncYamlPath);
         });
         LOGGER.info("Modules created successfully in {}", directoryPath);
     }

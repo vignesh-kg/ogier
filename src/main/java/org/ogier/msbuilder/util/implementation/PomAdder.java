@@ -65,7 +65,7 @@ public class PomAdder implements IPomAdder {
     }
 
     @Override
-    public void addPom(String directoryPath, String msName, String module, String groupId) {
+    public void addPom(String directoryPath, String msName, String module, String groupId, String apiYamlPath, String asyncYamlPath) {
         if ("parent".equalsIgnoreCase(module)) {
             Model model = createModel(new PomModel(groupId, msName + "-" + module,
                     OgierConstants.SNAPSHOT_VERSION, "pom", "${project.groupId}:${project.artifactId}", "4.0.0"));
