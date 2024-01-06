@@ -1,11 +1,10 @@
-package org.ogier.msbuilder.util;
+package org.ogier.msbuilder.util.implementation;
 
 import org.apache.maven.model.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.ogier.msbuilder.constants.OgierConstants;
 import org.ogier.msbuilder.records.PomModel;
-import org.ogier.msbuilder.util.implementation.OgierConfiguration;
 import org.ogier.msbuilder.util.interfaces.IPomAdder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
