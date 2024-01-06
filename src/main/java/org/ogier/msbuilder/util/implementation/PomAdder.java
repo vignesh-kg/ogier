@@ -82,8 +82,67 @@ public class PomAdder implements IPomAdder {
             model.setDependencies(createDependencies(module, msName, groupId));
             if ("api".equalsIgnoreCase(module) || "async".equalsIgnoreCase(module)) {
                 addAdditionalPropertiesForApiOrAsyncModules(module, model.getProperties(), groupId, apiYamlFileName, asyncYamlFileName);
+                addBuildToPOM(module, model, StringUtils.hasText(apiYamlFileName), StringUtils.hasText(asyncYamlFileName));
             }
             writeToPom(directoryPath, model);
+        }
+    }
+
+    private void addBuildToPOM(String module, Model model, boolean isApiYamlPresent, boolean isAsyncYamlPresent)
+    {
+        Build build = new Build();
+        List<Plugin> plugins = new ArrayList<>();
+        if("api".equalsIgnoreCase(module) && isApiYamlPresent)
+        {
+
+            Plugin plugin = new Plugin();
+            plugin.setGroupId("io.swagger.codegen.v3");
+            plugin.setArtifactId("swagger-codegen-maven-plugin");
+            List<PluginExecution> executions = new ArrayList<>();
+            PluginExecution execution = new PluginExecution();
+
+            Xpp3Dom configurationElement = new Xpp3Dom("configuration");
+            Xpp3Dom inputSpec = new Xpp3Dom("inputSpec");
+            inputSpec.setValue("${"+OgierConstants.SWAGGER_SRC_PROPERTY+"}");
+            inputSpec.setParent(configurationElement);
+            configurationElement.addChild(inputSpec);
+            Xpp3Dom language = new Xpp3Dom("language");
+            language.setValue("java");
+            language.setParent(configurationElement);
+            configurationElement.addChild(language);
+            Xpp3Dom configOptions = new Xpp3Dom("configOptions");
+            Xpp3Dom interfaceOnly = new Xpp3Dom("interfaceOnly");
+            interfaceOnly.setValue("true");
+            interfaceOnly.setParent(configOptions);
+            configOptions.addChild(interfaceOnly);
+            Xpp3Dom versionedApiConfiguration = new Xpp3Dom("versionedApiConfiguration");
+            versionedApiConfiguration.setValue("true");
+            versionedApiConfiguration.setParent(configOptions);
+            configOptions.addChild(versionedApiConfiguration);
+            configurationElement.addChild(configOptions);
+            Xpp3Dom modelPackage = new Xpp3Dom("modelPackage");
+            modelPackage.setValue("${"+OgierConstants.MODEL_PACKAGE+"}");
+            modelPackage.setParent(configurationElement);
+            configurationElement.addChild(modelPackage);
+            Xpp3Dom apiPackage = new Xpp3Dom("apiPackage");
+            apiPackage.setValue("${"+OgierConstants.API_PACKAGE+"}");
+            apiPackage.setParent(configurationElement);
+            configurationElement.addChild(apiPackage);
+            execution.setConfiguration(configurationElement);
+            List<String> goals = new ArrayList<>();
+            goals.add("generate");
+            execution.setGoals(goals);
+            executions.add(execution);
+            plugin.setExecutions(executions);
+            plugins.add(plugin);
+            build.setPlugins(plugins);
+
+            model.setBuild(build);
+        }
+
+        if("async".equalsIgnoreCase(module) && isAsyncYamlPresent)
+        {
+
         }
     }
 
