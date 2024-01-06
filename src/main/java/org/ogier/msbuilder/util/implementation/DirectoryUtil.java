@@ -38,10 +38,25 @@ public class DirectoryUtil implements IDirectoryUtil {
         String groupId = argMap.get(OgierConstants.KEY_GROUPID);
         String apiYamlPath = argMap.get(OgierConstants.API_YAML);
         String asyncYamlPath = argMap.get(OgierConstants.ASYNC_YAML);
-        String[] temp = apiYamlPath.split("/");
-        String apiYamlFileName = temp[temp.length - 1];
-        temp = asyncYamlPath.split("/");
-        String asyncYamlFileName = temp[temp.length - 1];
+
+        String apiYamlFileName;
+        if(StringUtils.hasText(apiYamlPath)) {
+            String[] temp = apiYamlPath.split("/");
+            apiYamlFileName = temp[temp.length - 1];
+        }
+        else {
+            apiYamlFileName = null;
+        }
+
+        String asyncYamlFileName;
+        if(StringUtils.hasText(asyncYamlPath)) {
+            String[] temp = asyncYamlPath.split("/");
+            asyncYamlFileName = temp[temp.length - 1];
+        }
+        else {
+            asyncYamlFileName = null;
+        }
+
         createRootDirectoryAndAddReactorPOM(directoryPath + msName, msName, modulesToCreate, groupId);
 
         modulesToCreate.forEach(moduleToCreate -> {
@@ -49,6 +64,7 @@ public class DirectoryUtil implements IDirectoryUtil {
             String rootDirectoryPath = directoryPath + msName + "/" + folderName;
             createDirectory(rootDirectoryPath);
             createSubFolders(groupId, moduleToCreate, rootDirectoryPath, apiYamlPath, asyncYamlPath);
+
             pomAdder.addPom(rootDirectoryPath, msName, moduleToCreate, groupId, apiYamlFileName, asyncYamlFileName);
         });
         LOGGER.info("Modules created successfully in {}", directoryPath);
