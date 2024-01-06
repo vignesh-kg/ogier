@@ -1,6 +1,11 @@
 org:
   ogier:
-    modules: api, resource, service, persistence, gateways, test, parent, async, exe
+    modules: parent, async, api, persistence, service, resource, gateways, test, exe
     mandatorymodules : parent, exe
     nonbusinessmodules: exe, api, async, test
     excludesubmodules: exe, api, async, parent
+    intermoduledependency:
+      resource: service, api
+      gateways: service, async
+      service: persistence
+      exe: resource, service, persistence, gateways

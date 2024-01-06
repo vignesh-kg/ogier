@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Component
-public class PomAdder implements IPomAdder
-{
+public class PomAdder implements IPomAdder {
     private static final Logger LOGGER = LoggerFactory.getLogger(PomAdder.class);
 
     @Autowired
@@ -30,20 +29,19 @@ public class PomAdder implements IPomAdder
     @Override
     public void createReactorPOM(String directoryPath, String msName, List<String> modules, String groupId) {
         // Create a new Model object
-        Model model = createModel(new PomModel(groupId, msName+"-reactor",
+        Model model = createModel(new PomModel(groupId, msName + "-reactor",
                 OgierConstants.SNAPSHOT_VERSION, "pom", "${project.groupId}:${project.artifactId}", "4.0.0"));
 
         List<String> modulesList = new ArrayList<>();
 
-        for(String module : modules)
-        {
-            modulesList.add(msName+"-"+module);
+        for (String module : modules) {
+            modulesList.add(msName + "-" + module);
         }
         Collections.sort(modulesList);
-        modulesList.remove(msName+"-parent");
-        modulesList.remove(msName+"-exe");
-        modulesList.add(0,msName+"-parent");
-        modulesList.add((modulesList.size()-1), msName+"-exe");
+        modulesList.remove(msName + "-parent");
+        modulesList.remove(msName + "-exe");
+        modulesList.add(0, msName + "-parent");
+        modulesList.add((modulesList.size() - 1), msName + "-exe");
         model.setModules(modulesList);
 
         Build build = new Build();
@@ -67,76 +65,79 @@ public class PomAdder implements IPomAdder
     }
 
     @Override
-    public void addPom(String directoryPath, String msName, String module, String groupId)
-    {
-        if("parent".equalsIgnoreCase(module))
-        {
-            Model model = createModel(new PomModel(groupId, msName+"-"+module,
+    public void addPom(String directoryPath, String msName, String module, String groupId) {
+        if ("parent".equalsIgnoreCase(module)) {
+            Model model = createModel(new PomModel(groupId, msName + "-" + module,
                     OgierConstants.SNAPSHOT_VERSION, "pom", "${project.groupId}:${project.artifactId}", "4.0.0"));
 
-            model.setParent(createParent(module, groupId,msName));
+            model.setParent(createParent(module, groupId, msName));
             model.setProperties(createProperties());
-            model.setDependencies(createDependencies(module));
+            model.setDependencies(createDependencies(module, msName, groupId));
             writeToPom(directoryPath, model);
-        }
-        else
-        {
-            Model model = createModel(new PomModel(groupId, msName+"-"+module,
+        } else {
+            Model model = createModel(new PomModel(groupId, msName + "-" + module,
                     OgierConstants.SNAPSHOT_VERSION, null, "${project.groupId}:${project.artifactId}", "4.0.0"));
             model.setParent(createParent(module, groupId, msName));
-            model.setDependencies(createDependencies(module));
+            model.setDependencies(createDependencies(module, msName, groupId));
             writeToPom(directoryPath, model);
         }
     }
 
-    private Properties createProperties()
-    {
+    private Properties createProperties() {
         Properties properties = new Properties();
         properties.setProperty(OgierConstants.MAPSTRUCT_VERSION, "1.5.5.Final");
 
         return properties;
     }
 
-    private List<Dependency> createDependencies(String module)
-    {
+    private List<Dependency> createDependencies(String module, String msName, String groupId) {
         List<Dependency> dependencyList = new ArrayList<>();
 
-        if(!ogierConfiguration.getNonbusinessmodules().contains(module))
-        {
+        if (!ogierConfiguration.getNonbusinessmodules().contains(module)) {
             Dependency mapStructDependency = new Dependency();
             mapStructDependency.setGroupId("org.mapstruct");
             mapStructDependency.setArtifactId("mapstruct");
-            mapStructDependency.setVersion("${"+OgierConstants.MAPSTRUCT_VERSION+"}");
-            if(!"parent".equalsIgnoreCase(module))
-            {
+            mapStructDependency.setVersion("${" + OgierConstants.MAPSTRUCT_VERSION + "}");
+            if (!"parent".equalsIgnoreCase(module)) {
                 mapStructDependency.setScope(OgierConstants.SCOPE_PROVIDED);
             }
             dependencyList.add(mapStructDependency);
         }
+        createInterModuleDependency(dependencyList, module, msName);
         return dependencyList;
     }
 
-    private Parent createParent(String module, String groupId, String msName)
-    {
-        Parent parent = new Parent();
-        if(module.equalsIgnoreCase("parent"))
+    private void createInterModuleDependency(List<Dependency> dependencyList, String module, String msName) {
+        if(ogierConfiguration.getIntermoduledependency().containsKey(module))
         {
+            List<String> moduleDependencies = ogierConfiguration.getIntermoduledependency().get(module);
+            for(String moduleDependency : moduleDependencies)
+            {
+                Dependency dependency = new Dependency();
+                dependency.setGroupId("${project.groupId}");
+                dependency.setArtifactId(msName+"-"+moduleDependency);
+                dependency.setVersion("${project.version}");
+                dependencyList.add(dependency);
+            }
+        }
+    }
+
+    private Parent createParent(String module, String groupId, String msName) {
+        Parent parent = new Parent();
+        if (module.equalsIgnoreCase("parent")) {
             parent.setGroupId("org.springframework.boot");
             parent.setArtifactId("spring-boot-starter-parent");
             parent.setVersion(OgierConstants.SPRINGBOOT_VERSION);
-        }
-        else
-        {
+        } else {
             parent.setGroupId(groupId);
-            parent.setArtifactId(msName+"-parent");
+            parent.setArtifactId(msName + "-parent");
             parent.setVersion("1.0.0-SNAPSHOT");
-            parent.setRelativePath("../"+msName+"-parent");
+            parent.setRelativePath("../" + msName + "-parent");
         }
         return parent;
     }
 
-    private Model createModel(PomModel pomModel)
-    {
+    private Model createModel(PomModel pomModel) {
         // Create a new Model object
         Model model = new Model();
         // Set the groupId, artifactId, and version
@@ -150,10 +151,9 @@ public class PomAdder implements IPomAdder
         return model;
     }
 
-    private void writeToPom(String directoryPath, Model model)
-    {
-        File pomXmlFile = new File(directoryPath+"/pom.xml");
-        LOGGER.info("Writing to pom in {}", directoryPath+"/pom.xml");
+    private void writeToPom(String directoryPath, Model model) {
+        File pomXmlFile = new File(directoryPath + "/pom.xml");
+        LOGGER.info("Writing to pom in {}", directoryPath + "/pom.xml");
         // Write the document to the file
         try (FileOutputStream fos = new FileOutputStream(pomXmlFile)) {
             MavenXpp3Writer writer = new MavenXpp3Writer();
