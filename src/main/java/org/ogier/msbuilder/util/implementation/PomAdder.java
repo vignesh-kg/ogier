@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,7 +66,7 @@ public class PomAdder implements IPomAdder {
     }
 
     @Override
-    public void addPom(String directoryPath, String msName, String module, String groupId, boolean isApiYamlPresent, boolean isAsyncYamlPresent) {
+    public void addPom(String directoryPath, String msName, String module, String groupId, String apiYamlFileName, String asyncYamlFileName) {
         if ("parent".equalsIgnoreCase(module)) {
             Model model = createModel(new PomModel(groupId, msName + "-" + module,
                     OgierConstants.SNAPSHOT_VERSION, "pom", "${project.groupId}:${project.artifactId}", "4.0.0"));
@@ -80,21 +81,21 @@ public class PomAdder implements IPomAdder {
             model.setParent(createParent(module, groupId, msName));
             model.setDependencies(createDependencies(module, msName, groupId));
             if ("api".equalsIgnoreCase(module) || "async".equalsIgnoreCase(module)) {
-                addAdditionalPropertiesForApiOrAsyncModules(module, model.getProperties(), groupId, isApiYamlPresent, isAsyncYamlPresent);
+                addAdditionalPropertiesForApiOrAsyncModules(module, model.getProperties(), groupId, apiYamlFileName, asyncYamlFileName);
             }
             writeToPom(directoryPath, model);
         }
     }
 
-    private void addAdditionalPropertiesForApiOrAsyncModules(String module, Properties properties, String groupId, boolean isApiYamlPresent, boolean isAsyncYamlPresent) {
-        if ("api".equalsIgnoreCase(module) && isApiYamlPresent) {
-            properties.setProperty(OgierConstants.SWAGGER_SRC_PROPERTY, "${project.basedir}/" + OgierConstants.SWAGGER_PATH);
+    private void addAdditionalPropertiesForApiOrAsyncModules(String module, Properties properties, String groupId, String apiYamlFileName, String asyncYamlFileName) {
+        if ("api".equalsIgnoreCase(module) && StringUtils.hasText(apiYamlFileName)) {
+            properties.setProperty(OgierConstants.SWAGGER_SRC_PROPERTY, "${project.basedir}/" + OgierConstants.SWAGGER_PATH+"/"+apiYamlFileName);
             properties.setProperty(OgierConstants.API_PACKAGE, groupId + ".resources.interfaces");
             properties.setProperty(OgierConstants.MODEL_PACKAGE, groupId + ".resources.models");
         }
 
-        if ("async".equalsIgnoreCase(module) && isAsyncYamlPresent) {
-            properties.setProperty(OgierConstants.SWAGGER_SRC_PROPERTY, "${project.basedir}/" + OgierConstants.SWAGGER_PATH);
+        if ("async".equalsIgnoreCase(module) && StringUtils.hasText(asyncYamlFileName)) {
+            properties.setProperty(OgierConstants.SWAGGER_SRC_PROPERTY, "${project.basedir}/" + OgierConstants.SWAGGER_PATH+"/"+asyncYamlFileName);
             properties.setProperty(OgierConstants.MODEL_PACKAGE, groupId + ".asyncmessages.models");
         }
     }
