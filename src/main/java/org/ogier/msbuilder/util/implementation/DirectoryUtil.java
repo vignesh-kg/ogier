@@ -35,8 +35,10 @@ public class DirectoryUtil implements IDirectoryUtil {
 
         modulesToCreate.forEach(moduleToCreate -> {
             String folderName = msName + "-" + moduleToCreate;
-            createDirectory(directoryPath + msName + "/" + folderName);
-            pomAdder.addPom(directoryPath + msName + "/" + folderName, msName, moduleToCreate, groupId);
+            String rootDirectoryPath = directoryPath + msName + "/" + folderName;
+            createDirectory(rootDirectoryPath);
+            createSubFolders(groupId, moduleToCreate, rootDirectoryPath);
+            pomAdder.addPom(rootDirectoryPath, msName, moduleToCreate, groupId);
         });
         LOGGER.info("Modules created successfully in {}", directoryPath);
     }
@@ -44,6 +46,29 @@ public class DirectoryUtil implements IDirectoryUtil {
     private void createRootDirectoryAndAddReactorPOM(String directoryPath, String msName, List<String> modules, String groupId) {
         createDirectory(directoryPath);
         pomAdder.createReactorPOM(directoryPath,msName,modules,groupId);
+    }
+
+    private void createSubFolders(String groupId, String module, String rootDirectoryPath)
+    {
+        LOGGER.info("{}",ogierConfiguration.getExcludesubmodules());
+        if(!ogierConfiguration.getExcludesubmodules().contains(module))
+        {
+            String copyGroupId = groupId.replace(".", "/");
+            if(!"test".equalsIgnoreCase(module))
+            {
+                String resourcesFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_RESOURCES;
+                createDirectory(resourcesFolderPath);
+                String subFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_JAVA + "/" + copyGroupId + "/" + module;
+                createDirectory(subFolderPath);
+            }
+            else
+            {
+                String resourcesFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_TEST_RESOURCES;
+                createDirectory(resourcesFolderPath);
+                String subFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_TEST_JAVA + "/" + copyGroupId + "/" + module;
+                createDirectory(subFolderPath);
+            }
+        }
     }
 
     @Override

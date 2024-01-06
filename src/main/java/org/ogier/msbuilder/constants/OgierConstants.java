@@ -13,4 +13,9 @@ public interface OgierConstants
     String SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
     String SCOPE = "scope";
     String SCOPE_PROVIDED = "provided";
+    String SRC_MAIN_JAVA = "src/main/java";
+    String SRC_MAIN_RESOURCES = "src/main/resources";
+
+    String SRC_TEST_JAVA = "src/test/java";
+    String SRC_TEST_RESOURCES = "src/test/resources";
 }

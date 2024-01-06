@@ -15,6 +15,16 @@ public class OgierConfiguration {
 
     private List<String> nonbusinessmodules = new ArrayList<>();
 
+    private List<String> excludesubmodules = new ArrayList<>();
+
+    public List<String> getExcludesubmodules() {
+        return excludesubmodules;
+    }
+
+    public void setExcludesubmodules(List<String> excludesubmodules) {
+        this.excludesubmodules = excludesubmodules;
+    }
+
     public List<String> getNonbusinessmodules() {
         return nonbusinessmodules;
     }
