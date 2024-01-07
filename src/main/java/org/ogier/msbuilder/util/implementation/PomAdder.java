@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import static org.ogier.msbuilder.constants.OgierConstants.*;
+
 @Component
 public class PomAdder implements IPomAdder {
     private static final Logger LOGGER = LoggerFactory.getLogger(PomAdder.class);
@@ -96,8 +98,9 @@ public class PomAdder implements IPomAdder {
         {
 
             Plugin plugin = new Plugin();
-            plugin.setGroupId("io.swagger.codegen.v3");
-            plugin.setArtifactId("swagger-codegen-maven-plugin");
+            plugin.setGroupId("org.openapitools");
+            plugin.setArtifactId("openapi-generator-maven-plugin");
+            plugin.setVersion("${"+OPENAPI_GENERATOR_PLUGIN_TAG+"}");
             List<PluginExecution> executions = new ArrayList<>();
             PluginExecution execution = new PluginExecution();
 
@@ -106,8 +109,8 @@ public class PomAdder implements IPomAdder {
             inputSpec.setValue("${"+OgierConstants.SWAGGER_SRC_PROPERTY+"}");
             inputSpec.setParent(configurationElement);
             configurationElement.addChild(inputSpec);
-            Xpp3Dom language = new Xpp3Dom("language");
-            language.setValue("java");
+            Xpp3Dom language = new Xpp3Dom("generatorName");
+            language.setValue("spring");
             language.setParent(configurationElement);
             configurationElement.addChild(language);
             Xpp3Dom configOptions = new Xpp3Dom("configOptions");
@@ -115,10 +118,27 @@ public class PomAdder implements IPomAdder {
             interfaceOnly.setValue("true");
             interfaceOnly.setParent(configOptions);
             configOptions.addChild(interfaceOnly);
-            Xpp3Dom versionedApiConfiguration = new Xpp3Dom("versionedApiConfiguration");
-            versionedApiConfiguration.setValue("true");
+            Xpp3Dom versionedApiConfiguration = new Xpp3Dom("dateLibrary");
+            versionedApiConfiguration.setValue("java8");
             versionedApiConfiguration.setParent(configOptions);
             configOptions.addChild(versionedApiConfiguration);
+            Xpp3Dom useOneOfInterfaces = new Xpp3Dom("useOneOfInterfaces");
+            useOneOfInterfaces.setValue("true");
+            useOneOfInterfaces.setParent(configOptions);
+            configOptions.addChild(useOneOfInterfaces);
+            Xpp3Dom useJakartaEe = new Xpp3Dom("useJakartaEe");
+            useJakartaEe.setValue("true");
+            useJakartaEe.setParent(configOptions);
+            configOptions.addChild(useJakartaEe);
+            Xpp3Dom delegatePattern = new Xpp3Dom("delegatePattern");
+            delegatePattern.setValue("true");
+            delegatePattern.setParent(configOptions);
+            configOptions.addChild(delegatePattern);
+            Xpp3Dom library = new Xpp3Dom("library");
+            library.setValue("spring-cloud");
+            library.setParent(configOptions);
+            configOptions.addChild(library);
+
             configurationElement.addChild(configOptions);
             Xpp3Dom modelPackage = new Xpp3Dom("modelPackage");
             modelPackage.setValue("${"+OgierConstants.MODEL_PACKAGE+"}");
@@ -161,8 +181,14 @@ public class PomAdder implements IPomAdder {
 
     private Properties createProperties() {
         Properties properties = new Properties();
-        properties.setProperty(OgierConstants.MAPSTRUCT_VERSION, "1.5.5.Final");
-
+        properties.setProperty(MAPSTRUCT_VERSION_TAG, MAPSTRUCT_VERSION);
+        properties.setProperty(OPENAPI_GENERATOR_PLUGIN_TAG, OPENAPI_GENERATOR_PLUGIN_VERSION);
+        properties.setProperty(SPRINGBOOT_STARTER_WEB_TAG, SPRINGBOOT_VERSION);
+        properties.setProperty(JACKSON_DATABIND_NULLABLE_TAG, JACKSON_DATABIND_NULLABLE_VERSION);
+        properties.setProperty(SWAGGER_ANNOTATIONS_TAG, SWAGGER_ANNOTATIONS_VERSION);
+        properties.setProperty(JACKSON_ANNOTATIONS_TAG, JACKSON_ANNOTATIONS_VERSION);
+        properties.setProperty(JAKARTA_VALIDATION_TAG, JAKARTA_VALIDATION_VERSION);
+        properties.setProperty(JAKARTA_ANNOTATION_TAG, JAKARTA_ANNOTATION_VERSION);
         return properties;
     }
 
@@ -173,12 +199,52 @@ public class PomAdder implements IPomAdder {
             Dependency mapStructDependency = new Dependency();
             mapStructDependency.setGroupId("org.mapstruct");
             mapStructDependency.setArtifactId("mapstruct");
-            mapStructDependency.setVersion("${" + OgierConstants.MAPSTRUCT_VERSION + "}");
+            mapStructDependency.setVersion("${" + MAPSTRUCT_VERSION_TAG + "}");
             if (!"parent".equalsIgnoreCase(module)) {
                 mapStructDependency.setScope(OgierConstants.SCOPE_PROVIDED);
             }
             dependencyList.add(mapStructDependency);
         }
+
+        if("api".equalsIgnoreCase(module))
+        {
+            Dependency jakartaAnnotationDependency = new Dependency();
+            jakartaAnnotationDependency.setGroupId("jakarta.annotation");
+            jakartaAnnotationDependency.setArtifactId("jakarta.annotation-api");
+            jakartaAnnotationDependency.setVersion("${" + JAKARTA_ANNOTATION_TAG + "}");
+            dependencyList.add(jakartaAnnotationDependency);
+
+            Dependency jakartaValidationDependency = new Dependency();
+            jakartaValidationDependency.setGroupId("jakarta.validation");
+            jakartaValidationDependency.setArtifactId("jakarta.validation-api");
+            jakartaValidationDependency.setVersion("${" + JAKARTA_VALIDATION_TAG + "}");
+            dependencyList.add(jakartaValidationDependency);
+
+            Dependency jacksonAnnotationsDependency = new Dependency();
+            jacksonAnnotationsDependency.setGroupId("com.fasterxml.jackson.core");
+            jacksonAnnotationsDependency.setArtifactId("jackson-annotations");
+            jacksonAnnotationsDependency.setVersion("${" + JACKSON_ANNOTATIONS_TAG + "}");
+            dependencyList.add(jacksonAnnotationsDependency);
+
+            Dependency swaggerAnnotationsDependency = new Dependency();
+            swaggerAnnotationsDependency.setGroupId("io.swagger.core.v3");
+            swaggerAnnotationsDependency.setArtifactId("swagger-annotations");
+            swaggerAnnotationsDependency.setVersion("${" + SWAGGER_ANNOTATIONS_TAG + "}");
+            dependencyList.add(swaggerAnnotationsDependency);
+
+            Dependency jacksonDatabindNullable = new Dependency();
+            jacksonDatabindNullable.setGroupId("org.openapitools");
+            jacksonDatabindNullable.setArtifactId("jackson-databind-nullable");
+            jacksonDatabindNullable.setVersion("${" + JACKSON_DATABIND_NULLABLE_TAG + "}");
+            dependencyList.add(jacksonDatabindNullable);
+
+            Dependency springBootStarterWebDependency = new Dependency();
+            springBootStarterWebDependency.setGroupId("org.springframework.boot");
+            springBootStarterWebDependency.setArtifactId("spring-boot-starter-web");
+            springBootStarterWebDependency.setVersion("${" + SPRINGBOOT_STARTER_WEB_TAG + "}");
+            dependencyList.add(springBootStarterWebDependency);
+        }
+
         createInterModuleDependency(dependencyList, module, msName);
         return dependencyList;
     }
