@@ -3,7 +3,7 @@ org:
     modules: parent, async, api, persistence, service, resource, gateways, test, exe
     mandatorymodules : parent, exe
     nonbusinessmodules: exe, api, async, test
-    excludesubmodules: exe, api, async, parent
+    excludesubmodules: api, async, parent
     intermoduledependency:
       resource: service, api
       gateways: service, async

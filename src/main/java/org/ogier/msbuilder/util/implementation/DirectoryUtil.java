@@ -80,8 +80,30 @@ public class DirectoryUtil implements IDirectoryUtil {
         if (!ogierConfiguration.getExcludesubmodules().contains(module)) {
             String copyGroupId = groupId.replace(".", "/");
             if (!"test".equalsIgnoreCase(module)) {
-                String resourcesFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_RESOURCES;
+                String resourcesFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_RESOURCES + "/META-INF/spring";
                 createDirectory(resourcesFolderPath);
+                File file = new File(resourcesFolderPath+"/org.springframework.boot.autoconfigure.AutoConfiguration.imports");
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                        System.out.println("File created: " + file.getName());
+                    } catch (IOException e) {
+                        System.out.println("An error occurred while creating the file: " + e.getMessage());
+                    }
+                }
+
+                if("exe".equalsIgnoreCase(module))
+                {
+                    file = new File(rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_RESOURCES + "/application.yml");
+                    if (!file.exists()) {
+                        try {
+                            file.createNewFile();
+                            System.out.println("File created: " + file.getName());
+                        } catch (IOException e) {
+                            System.out.println("An error occurred while creating the file: " + e.getMessage());
+                        }
+                    }
+                }
                 String subFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_JAVA + "/" + copyGroupId + "/" + module;
                 createDirectory(subFolderPath);
             } else {
