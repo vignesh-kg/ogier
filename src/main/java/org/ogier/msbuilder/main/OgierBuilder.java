@@ -31,7 +31,6 @@ public class OgierBuilder {
     }
 
     private void validateArgs(Set<String> args) throws Exception {
-        //msName=ogier directoryPath="/home/vigz/workspace/OS project/" groupId=org.ogier.ms
         List<String> mandatoryArgs = new ArrayList<>(Arrays.asList("msName", "directoryPath", "groupId"));
 
         for(String mandatoryArg : mandatoryArgs)
