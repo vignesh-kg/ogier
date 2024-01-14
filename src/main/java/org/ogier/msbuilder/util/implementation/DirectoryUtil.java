@@ -27,6 +27,9 @@ public class DirectoryUtil implements IDirectoryUtil {
     private OgierConfiguration ogierConfiguration;
 
     @Autowired
+    private MainClassUtil mainClassUtil;
+
+    @Autowired
     private IPomAdder pomAdder;
 
     @Override
@@ -92,8 +95,25 @@ public class DirectoryUtil implements IDirectoryUtil {
                     }
                 }
 
+                String subFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_JAVA + "/" + copyGroupId + "/" + module;
+
                 if("exe".equalsIgnoreCase(module))
                 {
+                    subFolderPath = subFolderPath + "/boot";
+                    createDirectory(subFolderPath);
+                    File mainClassFile = new File(subFolderPath + "/Boot.java");
+                    File bootConfigClassFile = new File(subFolderPath+ "/Config.java");
+                    if (!(mainClassFile.exists() || bootConfigClassFile.exists())) {
+                        try {
+                            mainClassFile.createNewFile();
+                            bootConfigClassFile.createNewFile();
+                            mainClassUtil.createMainClass(mainClassFile,groupId+"."+module+".boot");
+                            mainClassUtil.createConfigClass(bootConfigClassFile, groupId, groupId+"."+module+".boot");
+                            System.out.println("File created: " + mainClassFile.getName());
+                        } catch (IOException e) {
+                            System.out.println("An error occurred while creating the file: " + e.getMessage());
+                        }
+                    }
                     file = new File(rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_RESOURCES + "/application.yml");
                     if (!file.exists()) {
                         try {
@@ -104,9 +124,9 @@ public class DirectoryUtil implements IDirectoryUtil {
                         }
                     }
                 }
-                String subFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_MAIN_JAVA + "/" + copyGroupId + "/" + module;
                 createDirectory(subFolderPath);
-            } else {
+            }
+            else {
                 String resourcesFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_TEST_RESOURCES;
                 createDirectory(resourcesFolderPath);
                 String subFolderPath = rootDirectoryPath + "/" + OgierConstants.SRC_TEST_JAVA + "/" + copyGroupId + "/" + module;
