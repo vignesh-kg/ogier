@@ -26,6 +26,8 @@ public interface OgierConstants
     String SPRINGBOOT_STARTER_WEB_TAG = "spring-boot-starter-web.version";
     String SPRINGBOOT_VERSION = "3.2.1";
 
+    String SPRING_KAFKA_TAG = "spring-kafka.version";
+    String SPRING_KAFKA_VERSION = "3.1.1";
     String SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
     String SCOPE = "scope";
     String SCOPE_PROVIDED = "provided";
