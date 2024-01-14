@@ -189,6 +189,7 @@ public class PomAdder implements IPomAdder {
         properties.setProperty(JACKSON_ANNOTATIONS_TAG, JACKSON_ANNOTATIONS_VERSION);
         properties.setProperty(JAKARTA_VALIDATION_TAG, JAKARTA_VALIDATION_VERSION);
         properties.setProperty(JAKARTA_ANNOTATION_TAG, JAKARTA_ANNOTATION_VERSION);
+        properties.setProperty(SPRING_KAFKA_TAG, SPRING_KAFKA_VERSION);
         return properties;
     }
 
@@ -243,6 +244,15 @@ public class PomAdder implements IPomAdder {
             springBootStarterWebDependency.setArtifactId("spring-boot-starter-web");
             springBootStarterWebDependency.setVersion("${" + SPRINGBOOT_STARTER_WEB_TAG + "}");
             dependencyList.add(springBootStarterWebDependency);
+        }
+
+        if("async".equalsIgnoreCase(module))
+        {
+            Dependency jakartaAnnotationDependency = new Dependency();
+            jakartaAnnotationDependency.setGroupId("org.springframework.kafka");
+            jakartaAnnotationDependency.setArtifactId("spring-kafka");
+            jakartaAnnotationDependency.setVersion("${" + SPRING_KAFKA_TAG + "}");
+            dependencyList.add(jakartaAnnotationDependency);
         }
 
         createInterModuleDependency(dependencyList, module, msName);
