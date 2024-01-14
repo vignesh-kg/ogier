@@ -1,0 +1,10 @@
+package ${package};
+
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+
+@AutoConfiguration
+@ComponentScan(basePackages = {"${basePackage}"})
+public class Config {
+
+}
